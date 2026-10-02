@@ -1,0 +1,23 @@
+{
+  "name": "ledger-postgres",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "plugin.name": "pgoutput",
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "ledger",
+    "database.password": "ledger",
+    "database.dbname": "ledger",
+    "topic.prefix": "ledger",
+    "table.include.list": "public.customers,public.orders",
+    "slot.name": "ledger_slot",
+    "publication.autocreate.mode": "filtered",
+    "snapshot.mode": "initial",
+    "decimal.handling.mode": "string",
+    "tombstones.on.delete": "false",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false"
+  }
+}
