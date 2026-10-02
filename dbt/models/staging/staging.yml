@@ -1,0 +1,41 @@
+version: 2
+
+models:
+  - name: stg_orders_history
+    description: Order versions from silver (system-time SCD2).
+    tests:
+      - one_current_per_key: { key: order_id }
+      - no_overlapping_windows: { key: order_id }
+      - valid_window_order
+    columns:
+      - name: version_id
+        tests: [unique, not_null]
+      - name: order_id
+        tests: [not_null]
+      - name: customer_id
+        tests: [not_null]
+      - name: status
+        tests:
+          - not_null
+          - accepted_values: { values: [placed, confirmed, delivered, cancelled] }
+      - name: amount
+        tests: [not_null, non_negative]
+      - name: valid_from
+        tests: [not_null]
+
+  - name: stg_customers_history
+    description: Customer versions from silver (system-time SCD2).
+    tests:
+      - one_current_per_key: { key: customer_id }
+      - no_overlapping_windows: { key: customer_id }
+      - valid_window_order
+    columns:
+      - name: version_id
+        tests: [unique, not_null]
+      - name: customer_id
+        tests: [not_null]
+      - name: segment
+        tests:
+          - accepted_values: { values: [new, regular, gold] }
+      - name: valid_from
+        tests: [not_null]

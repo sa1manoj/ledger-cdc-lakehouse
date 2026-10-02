@@ -1,0 +1,23 @@
+version: 2
+
+sources:
+  - name: silver
+    description: >
+      SCD Type 2 history tables written by the Spark silver job
+      (src/ledger/jobs/silver.py). One row per source version; delete markers
+      have is_deleted = true. Read directly from Delta with DuckDB's delta_scan.
+    meta:
+      external_location: "delta_scan('{{ env_var('LAKE_ROOT') }}/silver/{name}')"
+    tables:
+      - name: orders
+        columns:
+          - name: version_id
+            tests: [unique, not_null]
+          - name: order_id
+            tests: [not_null]
+      - name: customers
+        columns:
+          - name: version_id
+            tests: [unique, not_null]
+          - name: customer_id
+            tests: [not_null]
