@@ -44,7 +44,7 @@ def bronze_df(spark, events):
 def _normalise(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     for c in ("order_ts", "updated_at", "valid_from", "valid_to"):
-        df[c] = pd.to_datetime(df[c], utc=True)
+        df[c] = pd.to_datetime(df[c], utc=True).dt.as_unit("us")
     df["amount"] = df["amount"].map(lambda v: f"{float(v):.2f}")
     df["is_current"] = df["is_current"].astype(bool)
     df["is_deleted"] = df["is_deleted"].astype(bool)
