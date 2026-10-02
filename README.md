@@ -1,5 +1,7 @@
 # Ledger: CDC Medallion Lakehouse
 
+[![ci](https://github.com/Sa1manoj/ledger-cdc-lakehouse/actions/workflows/ci.yml/badge.svg)](https://github.com/Sa1manoj/ledger-cdc-lakehouse/actions/workflows/ci.yml)
+
 Change data capture from Postgres into a Delta Lake medallion lakehouse, with
 full SCD Type 2 history, hard-delete propagation, a reconciliation gate, and a
 dbt gold layer.
