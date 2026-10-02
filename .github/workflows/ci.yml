@@ -1,0 +1,55 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install ruff
+      - run: ruff check .
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11", cache: pip }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "17" }
+      - run: pip install -e ".[spark,dev]"
+      - name: pytest (includes Spark + Delta parity tests)
+        run: pytest -q
+
+  dbt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11", cache: pip }
+      - run: pip install -e ".[dbt]"
+      - name: Build synthetic silver lake
+        run: python -m ledger.fixtures --out "$GITHUB_WORKSPACE/lake_fixture"
+      - name: dbt build (models + tests) against the fixture lake
+        working-directory: dbt
+        env:
+          LAKE_ROOT: ${{ github.workspace }}/lake_fixture
+          DUCKDB_PATH: ${{ github.workspace }}/ci.duckdb
+        run: dbt build --profiles-dir .
+
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - working-directory: infra/azure
+        run: |
+          terraform fmt -check
+          terraform init -backend=false
+          terraform validate
