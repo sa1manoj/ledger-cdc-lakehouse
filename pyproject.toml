@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ledger"
+version = "0.1.0"
+description = "CDC medallion lakehouse: Postgres -> Debezium -> Kafka -> Spark/Delta Lake -> dbt"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "pandas>=2.2",
+    "pyarrow>=16",
+    "deltalake>=0.22",
+    "psycopg[binary]>=3.2",
+]
+
+[project.optional-dependencies]
+spark = ["pyspark==4.0.1", "delta-spark==4.0.0"]
+dbt = ["dbt-duckdb>=1.9", "duckdb>=1.1"]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "B"]
